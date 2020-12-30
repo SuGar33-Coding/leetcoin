@@ -1,13 +1,12 @@
-import { opine } from "./deps.ts";
-import {
-    thing
-} from "./controllers/test.ts";
+import { opine } from "./utils/deps.ts";
+import router from "./routes.ts";
 
 const app = opine();
-const port = 5000;
+const PORT = 5000;
 
 // app.use(LogMiddleware).use(ErrorMiddleware);
 app
-  .get("/test", thing)
-  .listen({ port });
-console.log(`server listening on http://localhost:${port}`);
+  .use("/api", router)
+  .listen({ port: PORT });
+
+console.log(`server listening on http://localhost:${PORT}`);

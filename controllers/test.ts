@@ -1,5 +1,8 @@
-import { Response, Request } from "https://deno.land/x/opine@1.0.0/src/types.ts";
+import { Request, Response, ParamsDictionary } from "../utils/deps.ts";
 
-export function thing(req: Request, res: Response) {
-    res.send(req.hostname);
+export function get(
+  req: Request<ParamsDictionary, any, any>,
+  res: Response<any>
+) {
+  res.setStatus(200).send(`Host Name: '${req.hostname}'`);
 }
