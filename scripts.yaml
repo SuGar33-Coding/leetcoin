@@ -1,0 +1,14 @@
+scripts:
+  start:
+    desc: Start the server
+    cmd: main.ts
+    allow:
+      - net
+      - read
+  dev:
+    desc: Start server with watch
+    cmd: deno run --unstable main.ts
+    allow:
+      - net
+      - read
+    watch: true
