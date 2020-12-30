@@ -15,3 +15,8 @@ vr start
 ```
 vr dev
 ```
+
+## DB
+Here's the DB package we're using to connect to MongoDB:
+
+[denoDB](https://eveningkid.com/denodb-docs/)
