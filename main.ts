@@ -1,8 +1,10 @@
-import { Database, opine } from "./utils/deps.ts";
+import { Database, opine, opineCors } from "./utils/deps.ts";
 import router from "./routes.ts";
 import { User } from "./models/User.ts";
 
 const app = opine();
+
+app.use(opineCors());
 
 /* DB */
 const db = new Database(

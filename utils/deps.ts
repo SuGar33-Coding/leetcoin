@@ -11,3 +11,5 @@ export {
   DataTypes,
   Model
 } from "https://deno.land/x/denodb/mod.ts"
+
+export { opineCors } from "https://deno.land/x/cors/mod.ts";
