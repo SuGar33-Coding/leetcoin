@@ -25,7 +25,8 @@ db.sync({
 });
 
 await User.create({
-  name: "Testy McTestface"
+  name: "testy",
+  password: "123"
 });
 
 console.log(`INFO: DB connected: ${await db.ping()}`);
