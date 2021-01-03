@@ -20,9 +20,9 @@ export default {
     results = results as Model[]
 
     if (results.length > 0) {
-      res.setStatus(200).send(results[0].name);
+      res.setStatus(200).send(results[0]);
     } else {
-      res.setStatus(404).send();
+      res.setStatus(403).send();
     }
   },
 };
