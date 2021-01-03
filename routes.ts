@@ -13,5 +13,6 @@ router.get("/test", test.get);
 
 /** User */
 router.get("/user/:name", user.getByName);
+router.post("/user", user.create);
 
 export default router;
