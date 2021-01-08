@@ -9,8 +9,8 @@ import {
 
 export default {
   login: async (
-    req: Request<ParamsDictionary, any, any>,
-    res: Response<any>,
+    req: Request,
+    res: Response,
     next: NextFunction
   ) => {
     const userName = req.query.user;

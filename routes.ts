@@ -1,7 +1,7 @@
 import auth from "./controllers/auth.ts";
 import test from "./controllers/test.ts";
 import user from "./controllers/user.ts";
-import { Router } from './utils/deps.ts';
+import { Router } from "./utils/deps.ts";
 
 const router = Router();
 
@@ -12,7 +12,7 @@ router.get("/login", auth.login);
 router.get("/test", test.get);
 
 /** User */
-router.get("/user/:name", user.getByName);
+router.get("/user/balance", user.getBalance);
 router.post("/user", user.create);
 
 export default router;
