@@ -1,3 +1,3 @@
-# AutoQuest
+# LeetCoin
 
-Quest Automatically
+Sick currency bro
