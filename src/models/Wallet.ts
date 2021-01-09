@@ -7,7 +7,7 @@ export interface WalletType {
 interface IWallet extends Document, WalletType {}
 
 export const WalletSchema = new Schema({
-	balance: { type: Number, required: true },
+	balance: { type: Schema.Types.Decimal128, required: true },
 });
 
 export const Wallet = model<IWallet>("Wallet", WalletSchema);
