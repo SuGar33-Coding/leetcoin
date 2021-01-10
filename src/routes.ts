@@ -8,7 +8,9 @@ const router = Router();
 router.get("/login", auth.login);
 
 /** User */
+router.get("/user", user.getByName);
 router.post("/user", user.create);
 router.get("/user/balance", user.getBalance);
+router.post("/user/transaction", user.makeTransaction);
 
 export default router;
