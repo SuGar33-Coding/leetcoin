@@ -79,7 +79,6 @@ export default {
 		}
 
 		wallet.balance = parseFloat(wallet.balance.toString()) + parseFloat(req.query.amt as string);
-		console.log(wallet.balance);
 		
 		wallet = await wallet.save();
 
