@@ -78,10 +78,30 @@ export default {
 			return next(new HttpError(404, "Wallet wasn't found, somehow"));
 		}
 
-		wallet.balance = parseFloat(wallet.balance.toString()) + parseFloat(req.query.amt as string);
-		
+		wallet.balance =
+			parseFloat(wallet.balance.toString()) +
+			parseFloat(req.query.amt as string);
+
 		wallet = await wallet.save();
 
 		return res.status(200).send(wallet);
+	},
+
+	/**
+	 *
+	 * Get a list of all users in the db
+	 */
+	query: async (req: Request, res: Response, next: NextFunction) => {
+		const users = await User.find({}).select("name");
+
+		console.log(users);
+
+		if (!users) {
+			return next(
+				new HttpError(404, "There are no users in the Database")
+			);
+		}
+
+		return res.status(200).send(users);
 	},
 };
