@@ -1,17 +1,26 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { User } from "../models/User";
+import { HttpError } from "../types";
+import bcrypt from "bcrypt";
 
 export default {
-	login: async (req: Request, res: Response) => {
+	login: async (req: Request, res: Response, next: NextFunction) => {
+		const name = req.query.name as string;
+		const password = req.query.password as string;
+
 		const user = await User.findOne({
-			name: req.query.name as string,
-			password: req.query.password as string,
+			name,
 		});
 
-		if (user) {
-			res.sendStatus(200);
-		} else {
-			res.sendStatus(403);
+		if (!user) {
+			return next(new HttpError(404, "User not found"));
 		}
+
+		const isPasswordMatched = await bcrypt.compare(password, user.password);
+		if (!isPasswordMatched) {
+			return res.sendStatus(403);
+		}
+
+		return res.sendStatus(200);
 	},
 };

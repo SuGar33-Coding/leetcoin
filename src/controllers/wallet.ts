@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import { User } from "../models/User";
 import { Wallet, IWallet } from "../models/Wallet";
 import { HttpError } from "../types";
+import bcrypt from "bcrypt";
 
 /**
  * Changes and saves a wallet balance. Throws error on negative balance.
@@ -23,9 +24,11 @@ const changeWalletBalance = (wallet: IWallet, amt: number): void => {
 
 export default {
 	getBalance: async (req: Request, res: Response, next: NextFunction) => {
+		const name = req.query.name as string;
+		const password = req.query.password as string;
+
 		const user = await User.findOne({
-			name: req.query.name as string,
-			password: req.query.password as string,
+			name,
 		}).populate("wallet");
 
 		if (!user) {
@@ -38,6 +41,11 @@ export default {
 					"Could not find User's Wallet for some reason"
 				)
 			);
+		}
+
+		const isPasswordMatched = await bcrypt.compare(password, user.password);
+		if (!isPasswordMatched) {
+			return res.sendStatus(403);
 		}
 
 		const balance = user.wallet.balance;
@@ -88,7 +96,11 @@ export default {
 			return next(new HttpError(404, "Sender not found"));
 		}
 
-		if (senderUser.password != senderPassword) {
+		const isPasswordMatched = await bcrypt.compare(
+			senderPassword,
+			senderUser.password
+		);
+		if (!isPasswordMatched) {
 			return res.sendStatus(403);
 		}
 

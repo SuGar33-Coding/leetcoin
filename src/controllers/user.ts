@@ -2,8 +2,10 @@ import { NextFunction, Request, Response } from "express";
 import { User } from "../models/User";
 import { Wallet } from "../models/Wallet";
 import { HttpError } from "../types";
+import bcrypt from "bcrypt";
 
 export default {
+	/** Return non-sensitive info about user */
 	getByName: async (req: Request, res: Response, next: NextFunction) => {
 		const user = await User.findOne({ name: req.query.name as string });
 
@@ -19,26 +21,28 @@ export default {
 	},
 
 	create: async (req: Request, res: Response, next: NextFunction) => {
+		const name = req.query.name as string;
+		const password = req.query.password as string;
+
 		const wallet = await Wallet.create({
 			balance: 0.0,
 		});
 
+		const hashedPassword = await bcrypt.hash(password, 10);
+
 		try {
 			const user = await User.create({
-				name: req.query.name as string,
-				password: req.query.password as string,
+				name,
+				password: hashedPassword,
 				wallet: wallet._id,
 			});
 			return res.status(200).send(user);
 		} catch (exception) {
-			return next(new Error(exception));
+			return next(exception);
 		}
 	},
 
-	/**
-	 *
-	 * Get a list of all users in the db
-	 */
+	/** Get a list of all users in the db */
 	query: async (req: Request, res: Response, next: NextFunction) => {
 		const users = await User.find({}).select("name");
 
