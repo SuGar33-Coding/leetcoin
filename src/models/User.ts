@@ -7,7 +7,7 @@ export interface UserType {
 	wallet: WalletType;
 }
 
-interface IUser extends Document, UserType {}
+export interface IUser extends Document, UserType {}
 
 export const UserSchema = new Schema({
 	name: { type: String, required: true, unique: true },
