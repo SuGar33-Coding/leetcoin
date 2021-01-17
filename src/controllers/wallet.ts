@@ -126,4 +126,38 @@ export default {
 
 		return res.sendStatus(200);
 	},
+
+	makePayment: async (req: Request, res: Response, next: NextFunction) => {
+		const name = req.query.name as string;
+		const password = req.query.password as string;
+		const amt = parseFloat(req.query.amt as string);
+		const note = req.query.note;
+
+		const user = await User.findOne({
+			name,
+		});
+
+		if (!user) {
+			return next(new HttpError(404, "User not found"));
+		}
+
+		const isPasswordMatched = await bcrypt.compare(password, user.password);
+		if (!isPasswordMatched) {
+			return res.sendStatus(403);
+		}
+
+		const wallet = await Wallet.findById(user.wallet);
+
+		if (!wallet) {
+			return next(new HttpError(404, "Error retrieving wallet"));
+		}
+
+		try {
+			changeWalletBalance(wallet, amt * -1);
+		} catch (exception) {
+			return next(exception);
+		}
+
+		return res.status(200).send({ newBalance: wallet.balance });
+	},
 };
