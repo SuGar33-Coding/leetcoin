@@ -12,12 +12,14 @@ import { Transaction, TransactionType } from "../models/Transaction";
  * @param amt that the balance will change (positive or negative)
  * @param type of the change
  * @param secondaryWallet second wallet involved in the change (sender if TRANSFER)
+ * @param note for the transaction log
  */
 const changeWalletBalance = async (
 	wallet: IWallet,
 	amt: number,
 	type: "TRANSACTION" | "TRANSFER" | "PAYMENT",
-	secondaryWallet?: IWallet
+	secondaryWallet?: IWallet,
+	note?: string
 ) => {
 	let balance = parseFloat(wallet.balance.toString());
 
@@ -52,6 +54,9 @@ const changeWalletBalance = async (
 	};
 	if (secondaryWallet) {
 		transactionPayload.secondaryWallet = secondaryWallet;
+	}
+	if (note) {
+		transactionPayload.note = note;
 	}
 	Transaction.create(transactionPayload).catch((err) => {
 		console.error(err);
@@ -196,7 +201,17 @@ export default {
 		}
 
 		try {
-			await changeWalletBalance(wallet, amt * -1, "PAYMENT");
+			if (note) {
+				await changeWalletBalance(
+					wallet,
+					amt * -1,
+					"PAYMENT",
+					undefined,
+					note as string
+				);
+			} else {
+				await changeWalletBalance(wallet, amt * -1, "PAYMENT");
+			}
 		} catch (exception) {
 			return next(exception);
 		}

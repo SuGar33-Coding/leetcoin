@@ -17,5 +17,6 @@ router.get("/users", user.query);
 router.get("/wallet/balance", wallet.getBalance);
 router.post("/wallet/transaction", wallet.makeTransaction);
 router.post("/wallet/transfer", wallet.makeTransfer);
+router.post("/wallet/payment", wallet.makePayment);
 
 export default router;
