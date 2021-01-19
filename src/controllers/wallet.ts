@@ -3,13 +3,22 @@ import { User } from "../models/User";
 import { Wallet, IWallet } from "../models/Wallet";
 import { HttpError } from "../types";
 import bcrypt from "bcrypt";
+import { Transaction, TransactionType } from "../models/Transaction";
 
 /**
- * Changes and saves a wallet balance. Throws error on negative balance.
- * @param wallet that contains the affected balance
+ * Changes and saves a wallet balance. Also logs the change in the Transaction log.
+ * Throws error on negative balance.
+ * @param wallet that contains the affected balance (receiver if TRANSFER)
  * @param amt that the balance will change (positive or negative)
+ * @param type of the change
+ * @param secondaryWallet second wallet involved in the change (sender if TRANSFER)
  */
-const changeWalletBalance = (wallet: IWallet, amt: number): void => {
+const changeWalletBalance = async (
+	wallet: IWallet,
+	amt: number,
+	type: "TRANSACTION" | "TRANSFER" | "PAYMENT",
+	secondaryWallet?: IWallet
+) => {
 	let balance = parseFloat(wallet.balance.toString());
 
 	if (balance + amt < 0) {
@@ -19,7 +28,34 @@ const changeWalletBalance = (wallet: IWallet, amt: number): void => {
 	balance += amt;
 
 	wallet.balance = balance;
-	wallet.save();
+	await wallet.save();
+
+	// Perform other end of transfer if it's a transfer (subtract from sender)
+	if (type === "TRANSFER" && secondaryWallet) {
+		balance = parseFloat(secondaryWallet.balance.toString());
+		if (balance - amt < 0) {
+			throw new HttpError(
+				400,
+				"Secondary wallet balance cannot be negative"
+			);
+		}
+		balance -= amt;
+		secondaryWallet.balance = balance;
+		await secondaryWallet.save();
+	}
+
+	/* Generate the Transaction for the Log */
+	const transactionPayload: TransactionType = {
+		type,
+		amt,
+		primaryWallet: wallet,
+	};
+	if (secondaryWallet) {
+		transactionPayload.secondaryWallet = secondaryWallet;
+	}
+	Transaction.create(transactionPayload).catch((err) => {
+		console.error(err);
+	});
 };
 
 export default {
@@ -61,23 +97,26 @@ export default {
 		res: Response,
 		next: NextFunction
 	) => {
-		const user = await User.findOne({ name: req.query.name as string });
+		const name = req.query.name as string;
+		const amt = parseFloat(req.query.amt as string);
+
+		const user = await User.findOne({ name });
 
 		if (!user) {
 			return next(new HttpError(404, "User not found"));
 		}
 
-		let wallet = await Wallet.findById(user.wallet);
+		const wallet = await Wallet.findById(user.wallet);
 
 		if (!wallet) {
 			return next(new HttpError(404, "Wallet wasn't found, somehow"));
 		}
 
-		wallet.balance =
-			parseFloat(wallet.balance.toString()) +
-			parseFloat(req.query.amt as string);
-
-		wallet = await wallet.save();
+		try {
+			await changeWalletBalance(wallet, amt, "TRANSACTION");
+		} catch (error) {
+			return next(error);
+		}
 
 		return res.status(200).send(wallet);
 	},
@@ -118,8 +157,12 @@ export default {
 		}
 
 		try {
-			changeWalletBalance(senderWallet, amt * -1);
-			changeWalletBalance(receiverWallet, amt);
+			await changeWalletBalance(
+				receiverWallet,
+				amt,
+				"TRANSFER",
+				senderWallet
+			);
 		} catch (error) {
 			return next(error);
 		}
@@ -153,7 +196,7 @@ export default {
 		}
 
 		try {
-			changeWalletBalance(wallet, amt * -1);
+			await changeWalletBalance(wallet, amt * -1, "PAYMENT");
 		} catch (exception) {
 			return next(exception);
 		}
