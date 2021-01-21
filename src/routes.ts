@@ -1,5 +1,6 @@
 import { Router } from "express";
 import auth from "./controllers/auth";
+import transactions from "./controllers/transactions";
 import user from "./controllers/user";
 import wallet from "./controllers/wallet";
 
@@ -18,5 +19,8 @@ router.get("/wallet/balance", wallet.getBalance);
 router.post("/wallet/transaction", wallet.makeTransaction);
 router.post("/wallet/transfer", wallet.makeTransfer);
 router.post("/wallet/payment", wallet.makePayment);
+
+/** Transactions */
+router.get("/transactions", transactions.query);
 
 export default router;
