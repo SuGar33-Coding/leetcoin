@@ -17,7 +17,7 @@ import cors from "cors";
 const app = express();
 
 /* Logger */
-app.use(morgan("dev"));
+app.use(morgan("common"));
 
 /* Set up DB middleware */
 mongoose
