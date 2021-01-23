@@ -17,7 +17,7 @@ import { Transaction, TransactionType } from "../models/Transaction";
 const changeWalletBalance = async (
 	wallet: IWallet,
 	amt: number,
-	type: "TRANSACTION" | "TRANSFER" | "PAYMENT",
+	type: "TRANSACTION" | "TRANSFER" | "PAYMENT" | "EARNINGS",
 	secondaryWallet?: IWallet,
 	note?: string
 ) => {
@@ -217,5 +217,35 @@ export default {
 		}
 
 		return res.status(200).send({ newBalance: wallet.balance });
+	},
+
+	/**
+	 * Add the amount to the user's wallet, store the earnings and the type as the note,
+	 * and return the new wallet
+	 */
+	makeEarnings: async (req: Request, res: Response, next: NextFunction) => {
+		const name = req.query.name as string;
+		const amt = parseFloat(req.query.amt as string);
+		const type = req.query.type as string;
+
+		const user = await User.findOne({ name });
+
+		if (!user) {
+			return next(new HttpError(404, "User not found"));
+		}
+
+		const wallet = await Wallet.findById(user.wallet);
+
+		if (!wallet) {
+			return next(new HttpError(404, "Wallet wasn't found, somehow"));
+		}
+
+		try {
+			await changeWalletBalance(wallet, amt, "EARNINGS", undefined, type);
+		} catch (error) {
+			return next(error);
+		}
+
+		return res.status(200).send(wallet);
 	},
 };

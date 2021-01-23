@@ -2,7 +2,7 @@ import { Document, model, Schema } from "mongoose";
 import { WalletType } from "./Wallet";
 
 export interface TransactionType {
-	type: "TRANSACTION" | "TRANSFER" | "PAYMENT";
+	type: "TRANSACTION" | "TRANSFER" | "PAYMENT" | "EARNINGS";
 	amt: number;
 	note?: string;
 	primaryWallet: WalletType;
@@ -15,7 +15,7 @@ export const TransactionScheme = new Schema(
 	{
 		type: {
 			type: String,
-			enum: ["TRANSACTION", "TRANSFER", "PAYMENT"],
+			enum: ["TRANSACTION", "TRANSFER", "PAYMENT", "EARNINGS"],
 			required: true,
 		},
 		amt: { type: Schema.Types.Decimal128, required: true },
