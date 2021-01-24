@@ -89,9 +89,11 @@ export default {
 			return res.sendStatus(403);
 		}
 
-		const balance = user.wallet.balance;
+		const balance = user.wallet.balance.toString();
 
-		return res.status(200).send(balance.toString());
+		return res.status(200).send({
+			balance
+		});
 	},
 
 	/**
