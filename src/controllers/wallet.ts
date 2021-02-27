@@ -27,6 +27,10 @@ const changeWalletBalance = async (
 		throw new HttpError(400, "Wallet balance cannot be negative");
 	}
 
+	if (isNaN(amt)) {
+		throw new HttpError(400, "Amount cannot be NaN");
+	}
+
 	balance += amt;
 
 	wallet.balance = balance;
