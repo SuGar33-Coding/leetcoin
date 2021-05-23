@@ -23,5 +23,6 @@ router.post("/wallet/payment", wallet.makePayment);
 
 /** Transactions */
 router.get("/transactions", transactions.query);
+router.get("/transactions/earnings/day", transactions.dayEarningsAggregate);
 
 export default router;
