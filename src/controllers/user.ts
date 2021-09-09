@@ -44,7 +44,14 @@ export default {
 
 	/** Get a list of all users in the db */
 	query: async (req: Request, res: Response, next: NextFunction) => {
-		const users = await User.find({}).select("name");
+		const populateWallets = Boolean(req.query.populateWallets as string);
+
+		let users;
+		if (populateWallets) {
+			users = await User.find({}).select("name").populate("wallet");
+		} else {
+			users = await User.find({}).select("name");
+		}
 
 		if (!users) {
 			return next(
