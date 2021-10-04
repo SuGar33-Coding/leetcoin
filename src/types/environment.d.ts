@@ -6,6 +6,7 @@ declare global {
 			MONGO_URI: string;
 			TOKEN_SECRET: string;
 			PORT?: string;
+			ADMIN_PASSWORD: string;
 		}
 	}
 }

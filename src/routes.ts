@@ -8,6 +8,7 @@ const router = Router();
 
 /** Auth */
 router.get("/login", auth.login);
+router.get("/key", auth.createApiKey);
 
 /** User */
 router.get("/user", user.getByName);
