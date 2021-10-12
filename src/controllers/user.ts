@@ -61,4 +61,8 @@ export default {
 
 		return res.status(200).send(users);
 	},
+
+	addTelegram: async (req: Request, res: Response, next: NextFunction) => {
+		// code 
+	},
 };
