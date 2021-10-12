@@ -96,7 +96,7 @@ export default {
 		const balance = user.wallet.balance.toString();
 
 		return res.status(200).send({
-			balance
+			balance,
 		});
 	},
 
@@ -133,28 +133,33 @@ export default {
 	},
 
 	makeTransfer: async (req: Request, res: Response, next: NextFunction) => {
-		const senderName = req.query.sender as string;
-		const senderPassword = req.query.password as string;
 		const receiverName = req.query.receiver as string;
 		const amt = parseFloat(req.query.amt as string);
+		const telegramId = req.query.telegramId as string;
+		const senderName = req.query.sender as string;
+		const senderPassword = req.query.password as string;
 
-		const senderUser = await User.findOne({
-			name: senderName,
-		});
+		const senderUser = telegramId
+			? await User.findOne({ telegramId })
+			: await User.findOne({ name: senderName });
 
 		if (!senderUser) {
 			return next(new HttpError(404, "Sender not found"));
 		}
 
-		const isPasswordMatched = await bcrypt.compare(
-			senderPassword,
-			senderUser.password
-		);
-		if (!isPasswordMatched) {
-			return res.sendStatus(403);
+		if (!telegramId) {
+			const isPasswordMatched = await bcrypt.compare(
+				senderPassword,
+				senderUser.password
+			);
+			if (!isPasswordMatched) {
+				return res.sendStatus(403);
+			}
 		}
 
-		const receiverUser = await User.findOne({ name: receiverName });
+		const receiverUser = telegramId
+			? await User.findOne({ telegramId: receiverName })
+			: await User.findOne({ name: receiverName });
 
 		if (!receiverUser) {
 			return next(new HttpError(404, "Receiver not found"));

@@ -3,6 +3,7 @@ import { User } from "../models/User";
 import { Wallet } from "../models/Wallet";
 import { HttpError } from "../types";
 import bcrypt from "bcrypt";
+import { isCredentialsValid, isKeyValid } from "../util/auth";
 
 export default {
 	/** Return non-sensitive info about user */
@@ -62,7 +63,25 @@ export default {
 		return res.status(200).send(users);
 	},
 
-	addTelegram: async (req: Request, res: Response, next: NextFunction) => {
-		// code 
+	addTelegramId: async (req: Request, res: Response, next: NextFunction) => {
+		const apiKey = req.body.apiKey as string;
+		const telegramId = req.body.telegramId as string;
+		const username = req.body.username as string;
+		const password = req.body.password as string;
+
+		if (!(await isCredentialsValid(username, password))) {
+			console.error("invalid creds");
+
+			return res.sendStatus(403);
+		}
+
+		if (!(await isKeyValid(apiKey))) {
+			console.error("invalid key");
+			return res.sendStatus(403);
+		}
+
+		await User.updateOne({ name: username }, { telegramId });
+
+		return res.sendStatus(200);
 	},
 };

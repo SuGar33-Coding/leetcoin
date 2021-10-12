@@ -13,6 +13,7 @@ router.get("/key", auth.createApiKey);
 /** User */
 router.get("/user", user.getByName);
 router.post("/user", user.create);
+router.put("/user/tgId", user.addTelegramId);
 router.get("/users", user.query);
 
 /** Wallet */

@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import { User } from "../models/User";
+import { isCredentialsValid } from "../util/auth";
 import { HttpError } from "../types";
-import bcrypt from "bcrypt";
 import { Key } from "../models/Key";
 
 export default {
@@ -9,20 +8,9 @@ export default {
 		const name = req.query.name as string;
 		const password = req.query.password as string;
 
-		const user = await User.findOne({
-			name,
-		});
+		const isValid = await isCredentialsValid(name, password);
 
-		if (!user) {
-			return next(new HttpError(404, "User not found"));
-		}
-
-		const isPasswordMatched = await bcrypt.compare(password, user.password);
-		if (!isPasswordMatched) {
-			return res.sendStatus(403);
-		}
-
-		return res.sendStatus(200);
+		return isValid ? res.sendStatus(200) : res.sendStatus(403);
 	},
 
 	createApiKey: async (req: Request, res: Response, next: NextFunction) => {
