@@ -157,9 +157,7 @@ export default {
 			}
 		}
 
-		const receiverUser = telegramId
-			? await User.findOne({ telegramId: receiverName })
-			: await User.findOne({ name: receiverName });
+		const receiverUser = await User.findOne({ name: receiverName });
 
 		if (!receiverUser) {
 			return next(new HttpError(404, "Receiver not found"));
